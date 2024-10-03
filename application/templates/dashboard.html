@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Intelligence Bussiness</title>
+    <style>
+        body {
+            /* Fondo degradado de azul a más claro */
+            background: linear-gradient(to bottom, #007bff, #87CEEB);
+            height: 100vh; /* Asegura que cubra toda la ventana */
+            margin: 0;
+        }   
+        </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/redireccionar">Bussiness Intelligence</a>
+            <!-- <button class="nabvar-toggler" type="button" data-bs-toggle="collapse"
+             data-bs-target="#navbarText"
+                aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button> -->
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white">Home</a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a href="#" class="nav-link text-white">Opcion 1</a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link text-white">Opcion 2</a>
+                    </li> -->
+                </ul>
+            </div>
+        </div>
+
+    </nav>
+    <div class="container align-content-center">
+        <div>
+            <h2 style="color: yellow;"><strong>DASHBOARD SUPERMERCADO</strong>
+            </h2>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-3 mt-2">
+            <div class="col">
+                <div>
+                
+                    <div class="card text-bg-dark mb-3">
+                        <div class="card-header">
+                          <h5>  <strong style="color: yellow;">TOTAL VENTAS</strong></h5>
+                        </div>
+                        <div class="card-body">
+                            <h3>    {{ graph_html_total_ventas|safe }} Bs.</h3>
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col text-start">
+                <div class="card text-bg-dark mb-3">
+                    <!-- <div class="card-header">
+                        <h3><strong>DASHBOARD</strong></h3>
+                    </div>
+                    <div class="card-body">
+                        <h5><strong style="color: yellow;">Supermercado </strong></h5>
+                    </div>
+                    <div>
+                    </div> -->
+
+                    <div class="card-header">
+                        <h5>  <strong style="color: yellow;">COSTOS</strong></h5>
+                      </div>
+                      <div class="card-body">
+                          <h3>    {{ graph_html_total_costos|safe }} Bs.</h3>
+                      </div>
+
+                </div>
+
+
+            </div>
+
+            <div class="col text-end">
+                <div class="card text-bg-dark mb-3">
+                    <div class="card-header">
+                      <h5>  <strong style="color: yellow;">INGRESOS BRUTOS</strong></h5>
+                    </div>
+                    <div class="card-body">
+                        <h3>  {{ graph_html_total_ingreso|safe }} Bs.  </h3>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-3">
+                <div class="card text-bg-primary">
+                    <div class="card-header">
+                        <h4>Meses de ventas
+                        </h4>
+                        <div class="card-body">
+                            <form action="/filtrar" method="post">
+                                {% for mes in meses_ventas %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="meses" value="{{ mes }}" id="{{ mes }}">
+                                        <label class="form-check-label" for="{{ mes }}">{{ mes }}</label>
+                                    </div>
+                                {% endfor %}
+                                <button class="btn btn-primary" type="submit">Filtrar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="card  text-bg-dark mt-2">
+                    <div class="card-header">
+                        <h3> <strong style="color: yellow;">Tipos de pago</strong></h3>
+                    </div>
+                    {{ grafico_pago|safe }}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card  text-bg-dark">
+                    <div class="card-header">
+                       <h3> <strong style="color: yellow;">Categorías</strong></h3>
+                    </div>
+                        {{ grafico_categ|safe }}
+                </div>
+            </div>
+            <div class="col-3" >
+                <div class="card  text-bg-dark">
+                    <div class="card-header">
+                        <h3> <strong style="color: yellow;">{{ cant_sucursales|safe }} Sucursales</strong></h3>
+                    </div>
+                    {{ grafico_suc|safe }}
+                </div>
+
+                <div class="card  text-bg-dark mt-2">
+                    <div class="card-header">
+                        <h3> <strong style="color: yellow;">Horas mas concurridas</strong></h3>
+                    </div>
+                    {{ grafico_hora|safe }}
+                </div>
+            </div>
+        </div>
+   
+        <!-- <div>
+            {{ graph_html|safe }}
+        </div> -->
+
+    </div>
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
