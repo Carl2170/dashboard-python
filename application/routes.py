@@ -13,6 +13,8 @@ import plotly.graph_objs as go
 import plotly.io as pio
 import os
 
+from application import functions
+
 UPLOAD_FOLDER = 'application/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -26,301 +28,65 @@ def home():
 @app.route('/upload-file', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        # Obtener el archivo de la solicitud
-        file = request.files['file']
-        csv_name = request.form['csv_name']
+        # Inicializa el dashboard con los datos del archivo
+        dashboard_data = functions.init_dashboard(request)
 
-        # Verificar que se haya seleccionado un archivo
-        if file and file.filename.endswith('.xlsx'):
-
-            # Cargar el archivo Excel en un DataFrame
-            df = pd.read_excel(file)
-            dfO = df
-            # Guardar el DataFrame como CSV
-            csv_path = os.path.join(UPLOAD_FOLDER, f"{csv_name}.csv")
-            nombre_archivo =f"{csv_name}.csv" 
-            df.to_csv(csv_path, index=False)
-
-    #TOTAL VENTAS
-    graph_html_total_ventas= totalVentas(df)
-
-    #TOTAL COSTO
-    graph_html_total_costos = total_costo(df)
-
-    #TOTAL INGRESO
-    graph_html_total_ingreso = total_ingreso(df)
-
-    #CANT SUCURSALES
-    cant_sucursales = cantidad_sucursales(df)
+        # Renderiza el template del dashboard y pasa los datos
+        return render_template('dashboard.html', **dashboard_data)
     
-    #MESES
-    meses_ventas = meses(df)
-
-    #GRAFICO VENTAS POR CATEGORIA
-    grafico_categ = grafico_categoria(df)
-    #GRAFICO VENTAS POR SUCURSAL
-    grafico_suc = grafico_sucursales(df)
-    #GRAFICO VENTAS POR TIPO PAGO
-    grafico_pago = grafico_tipo_pago(df)
-    #GRAFICO VENTAS POR HORA
-    grafico_hora = grafico_ventas_hora(df)
-
-    return render_template('dashboard.html',
-                           graph_html_total_ventas=graph_html_total_ventas,
-                           graph_html_total_costos=graph_html_total_costos,
-                           graph_html_total_ingreso=graph_html_total_ingreso,
-                           cant_sucursales=cant_sucursales,
-                           meses_ventas=meses_ventas,
-                           grafico_categ=grafico_categ,
-                           grafico_suc=grafico_suc,
-                           grafico_pago=grafico_pago,
-                           grafico_hora=grafico_hora)
-
+    # Si es una solicitud GET, puede devolver la página de subida de archivo o un error
+    return render_template('upload_file.html')
 
 @app.route('/filtrar',  methods=['GET', 'POST'])
 def filtrar():    
     # Obtener los meses seleccionados del formulario
-    meses_seleccionados = request.form.getlist('meses')
+    months_seleted = request.form.getlist('meses')
 
     # Verificar si se seleccionaron meses
-    if not meses_seleccionados:
+    if not months_seleted:
         return redirect(url_for('upload_file'))
 
+    dashboard_filter= functions.filter_by_time(months_seleted,'datos.csv')
+    return render_template('dashboard.html', **dashboard_filter)
     # Filtrar el DataFrame por los meses seleccionados
-    df = pd.read_csv(os.path.join(UPLOAD_FOLDER, 'datos.csv'))  # Reemplaza con el nombre de tu archivo CSV guardado
-    df['Fecha'] = pd.to_datetime(df['Fecha'])
+    # df = pd.read_csv(os.path.join(UPLOAD_FOLDER, 'datos.csv'))  # Reemplaza con el nombre de tu archivo CSV guardado
+    # df['Fecha'] = pd.to_datetime(df['Fecha'])
     
-    # Diccionario de nombres de meses en español
-    nombres_meses = {
-        1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 
-        6: 'Junio', 7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 
-        10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
-    }
+    # # Diccionario de nombres de meses en español
+    # nombres_meses = {
+    #     1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 
+    #     6: 'Junio', 7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 
+    #     10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+    # }
     
-    # Añadir la columna de nombre del mes
-    df['Mes'] = df['Fecha'].dt.month.map(nombres_meses)
+    # # Añadir la columna de nombre del mes
+    # df['Mes'] = df['Fecha'].dt.month.map(nombres_meses)
     
-    # Filtrar el DataFrame por los meses seleccionados
-    df_filtrado = df[df['Mes'].isin(meses_seleccionados)]
+    # # Filtrar el DataFrame por los meses seleccionados
+    # df_filtrado = df[df['Mes'].isin(meses_seleccionados)]
 
-    # Actualizar los gráficos con los datos filtrados
-    graph_html_total_ventas = totalVentas(df_filtrado)
-    graph_html_total_costos = total_costo(df_filtrado)
-    graph_html_total_ingreso = total_ingreso(df_filtrado)
-    grafico_categ = grafico_categoria(df_filtrado)    
-    cant_sucursales = cantidad_sucursales(df)
-    grafico_suc = grafico_sucursales(df_filtrado)
-    grafico_pago = grafico_tipo_pago(df_filtrado)
-    grafico_hora = grafico_ventas_hora(df_filtrado)
-    meses_ventas = meses(df)
-
-
-    return render_template('dashboard.html',
-                           graph_html_total_ventas=graph_html_total_ventas,
-                           graph_html_total_costos=graph_html_total_costos,
-                           graph_html_total_ingreso=graph_html_total_ingreso,
-                           grafico_categ=grafico_categ,
-                           grafico_suc=grafico_suc,
-                           grafico_pago=grafico_pago,
-                           grafico_hora=grafico_hora,
-                           cant_sucursales=cant_sucursales,
-                           meses_ventas=meses_ventas)
-
-@app.route('/redireccionar')
-def redireccion():
-    return redirect('dashboard')
-
-def totalVentas(df):
-    total_ventas = df['Total'].sum()
-#total_ventas_formateado = f"${total_ventas:,.2f}"
-    total_ventas_formateado = format_currency(total_ventas)
-    return total_ventas_formateado
-
-def total_costo(df):
-    total_costo = df['Costo de Bienes Vendidos'].sum()
-    #total_ventas_formateado = f"${total_ventas:,.2f}"
-    total_costo_formateado = format_currency(total_costo)
-    return total_costo_formateado  
-
-def total_ingreso(df):
-    total_ingreso = df['Ingreso Bruto'].sum()
-    total_ingreso_formateado=format_currency(total_ingreso)
-    return total_ingreso_formateado
-
-def grafico_ventas_hora(df):
-    df['Total'] = pd.to_numeric(df['Total'], errors='coerce')
-    df['Hora'] = pd.to_datetime(df['Hora'], errors='coerce', format='%H:%M')
-    df['Hora Dia'] = df['Hora'].dt.hour
-    compras_por_hora = df['Hora Dia'].value_counts().sort_index()
+    # # Actualizar los gráficos con los datos filtrados
+    # graph_html_total_ventas = totalVentas(df_filtrado)
+    # graph_html_total_costos = total_costo(df_filtrado)
+    # graph_html_total_ingreso = total_ingreso(df_filtrado)
+    # grafico_categ = grafico_categoria(df_filtrado)    
+    # cant_sucursales = cantidad_sucursales(df)
+    # grafico_suc = grafico_sucursales(df_filtrado)
+    # grafico_pago = grafico_tipo_pago(df_filtrado)
+    # grafico_hora = grafico_ventas_hora(df_filtrado)
+    # meses_ventas = meses(df)
 
 
-    fig = px.bar(compras_por_hora, 
-             x=compras_por_hora.index, 
-             y=compras_por_hora.values, 
-             labels={'x': 'Hora del Día', 'y': 'Número de Compras'})
-
-    fig.update_layout(
-        width=255,
-        height=250,
-        plot_bgcolor='black',  # Fondo del área del gráfico
-        paper_bgcolor='black',  # Fondo del gráfico completo
-        font=dict(color='white')  # Cambiar el color de las fuentes a blanco para que sean visibles
-    )
-
-    fig.update_layout(xaxis=dict(showticklabels=False))
-    grafico = fig.to_html(full_html=False)
-    return grafico
-
-def grafico_categoria(df):
-    df['Total'] = pd.to_numeric(df['Total'], errors='coerce')
-    ventas_por_categoria = df.groupby('Categoria')['Total'].sum().reset_index()
-    fig = px.bar(
-        ventas_por_categoria,
-        x='Categoria',
-        y='Total',
-        labels={'Categoría': 'Categoría', 'Total': 'Total de Ventas'},
-        color='Categoria',
-        color_discrete_sequence=px.colors.qualitative.Prism ,
-        height=400 # Puedes cambiar la paleta de colores
-
-    )
-
-    fig.update_layout(
-        height=380,
-        plot_bgcolor='black',  # Fondo del área del gráfico
-        paper_bgcolor='black',  # Fondo del gráfico completo
-        font=dict(color='white')  # Cambiar el color de las fuentes a blanco para que sean visibles
-    )
-
-    fig.update_layout(xaxis=dict(showticklabels=False))
-
-
-    grafico = fig.to_html(full_html=False)
-    return grafico
-
-def grafico_sucursales(df):
-    df['Total'] = pd.to_numeric(df['Total'], errors='coerce')
-
-    ventas_por_sucursal = df.groupby('Sucursal')['Total'].sum().reset_index()
-
-    # Crear gráfico de torta con Plotly
-    fig = px.pie(
-        ventas_por_sucursal, 
-        names='Sucursal',       
-        values='Total',        
-        labels={'Sucursal': 'Sucursal', 'Total': 'Total de Ventas'},
-        color_discrete_sequence=px.colors.sequential.RdBu  # Esquema de color
-    )
-
-    # Añadir más configuraciones para controlar la posición del texto
-    fig.update_traces(
-        textposition='outside',    # Poner las etiquetas fuera del gráfico
-        textinfo='label+percent'   # Mostrar nombre de la sucursal y porcentaje
-    )
-
-    # Configuración del layout
-    fig.update_layout(
-        height=200,
-        showlegend=False,  # Mostrar leyenda con las sucursales
-        # legend_title="Sucursales",  # Título de la leyenda
-        # legend=dict(
-        #     orientation="h",      # Leyenda horizontal debajo del gráfico
-        #     yanchor="bottom",
-        #     y=-0.3,
-        #     xanchor="center",
-        #     x=0.5
-        #),
-        margin=dict(t=0, b=0, l=0, r=0),  # Ajustar márgenes: reducir espacio superior e inferior
-        title_y=0.55
-    )
-
-    fig.update_layout(
-        plot_bgcolor='black',  # Fondo del área del gráfico
-        paper_bgcolor='black',  # Fondo del gráfico completo
-        font=dict(color='white')  # Cambiar el color de las fuentes a blanco para que sean visibles
-    )
-
-    fig.update_layout(xaxis=dict(showticklabels=False))
-
-    grafico_torta_html = fig.to_html(full_html=False)
-    return grafico_torta_html
-
-def grafico_tipo_pago(df):
-    df['Total'] = pd.to_numeric(df['Total'], errors='coerce')
-    ventas_por_tipo_pago = df.groupby('Pago')['Total'].sum().reset_index()
-    fig = px.pie(
-        ventas_por_tipo_pago, 
-        names='Pago',       
-        values='Total',        
-        labels={'Pago': 'Pago', 'Total': 'Total de Ventas'},
-        color_discrete_sequence=px.colors.sequential.Agsunset  # Esquema de color
-    )
-    fig.update_layout(
-        height=290,
-        showlegend=True,
-        legend=dict(
-            orientation="h",      # Leyenda horizontal debajo del gráfico
-            yanchor="bottom",
-            y=-0.3,
-            xanchor="center",
-            x=0.5
-        ),
-    )
-    fig.update_layout(
-        plot_bgcolor='black',  # Fondo del área del gráfico
-        paper_bgcolor='black',  # Fondo del gráfico completo
-        font=dict(color='white')  # Cambiar el color de las fuentes a blanco para que sean visibles
-    )
-
-    fig.update_layout(xaxis=dict(showticklabels=False))
-    grafico_torta_pago = fig.to_html(full_html=False)
-    return grafico_torta_pago
-
-def grafico_productos(df):
-    ventas_por_producto = df.groupby('Producto')['Ventas'].sum()
-    productos_ordenados = ventas_por_producto.sort_values(ascending=False)
-    top_5_productos = productos_ordenados.head(5)
-    
-
-def venta_mes(array_mes, df):
-        total_ventas = df['Total'].sum()
-
-def format_currency(value):
-    if value >= 1_000_000:
-        return f"{value / 1_000_000:,.2f} millones"
-    elif value >= 1_000:
-        return f"{value / 1_000:,.2f} mil"
-    else:
-        return f"{value:,.2f}"
-    
-def cantidad_sucursales(df):
-    return df['Sucursal'].nunique()
-
-def meses(df):
-    df['Fecha'] = pd.to_datetime(df['Fecha'])
-    df['Mes'] = df['Fecha'].dt.month
-    
-    # Crear un diccionario con los nombres de los meses en español
-    nombres_meses = {
-        1: 'Enero', 
-        2: 'Febrero', 
-        3: 'Marzo', 
-        4: 'Abril', 
-        5: 'Mayo', 
-        6: 'Junio', 
-        7: 'Julio', 
-        8: 'Agosto', 
-        9: 'Septiembre', 
-        10: 'Octubre', 
-        11: 'Noviembre', 
-        12: 'Diciembre'
-    }
-    
-    df['Mes'] = df['Mes'].map(nombres_meses)
-    meses_ventas = df['Mes'].unique()
-    meses_ventas = sorted(meses_ventas, key=lambda x: list(nombres_meses.values()).index(x))
-    return meses_ventas
-
+    # return render_template('dashboard.html',
+    #                        graph_html_total_ventas=graph_html_total_ventas,
+    #                        graph_html_total_costos=graph_html_total_costos,
+    #                        graph_html_total_ingreso=graph_html_total_ingreso,
+    #                        grafico_categ=grafico_categ,
+    #                        grafico_suc=grafico_suc,
+    #                        grafico_pago=grafico_pago,
+    #                        grafico_hora=grafico_hora,
+    #                        cant_sucursales=cant_sucursales,
+    #                        meses_ventas=meses_ventas)
 
 
 @app.route('/graficos')

@@ -55,7 +55,7 @@
                           <h5>  <strong style="color: yellow;">TOTAL VENTAS</strong></h5>
                         </div>
                         <div class="card-body">
-                            <h3>    {{ graph_html_total_ventas|safe }} Bs.</h3>
+                            <h3>    {{ sales_total|safe }} Bs.</h3>
                         </div>
                         <div>
                         </div>
@@ -77,7 +77,7 @@
                         <h5>  <strong style="color: yellow;">COSTOS</strong></h5>
                       </div>
                       <div class="card-body">
-                          <h3>    {{ graph_html_total_costos|safe }} Bs.</h3>
+                          <h3>    {{ cost_total|safe }} Bs.</h3>
                       </div>
 
                 </div>
@@ -91,7 +91,7 @@
                       <h5>  <strong style="color: yellow;">INGRESOS BRUTOS</strong></h5>
                     </div>
                     <div class="card-body">
-                        <h3>  {{ graph_html_total_ingreso|safe }} Bs.  </h3>
+                        <h3>  {{ utility|safe }} Bs.  </h3>
                     </div>
                     <div>
                     </div>
@@ -107,7 +107,7 @@
                         </h4>
                         <div class="card-body">
                             <form action="/filtrar" method="post">
-                                {% for mes in meses_ventas %}
+                                {% for mes in number_months %}
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="meses" value="{{ mes }}" id="{{ mes }}">
                                         <label class="form-check-label" for="{{ mes }}">{{ mes }}</label>
@@ -124,7 +124,7 @@
                     <div class="card-header">
                         <h3> <strong style="color: yellow;">Tipos de pago</strong></h3>
                     </div>
-                    {{ grafico_pago|safe }}
+                    {{ type_payment_graph|safe }}
                 </div>
             </div>
             <div class="col-6">
@@ -132,22 +132,22 @@
                     <div class="card-header">
                        <h3> <strong style="color: yellow;">Categorías</strong></h3>
                     </div>
-                        {{ grafico_categ|safe }}
+                        {{ cate_graph|safe }}
                 </div>
             </div>
             <div class="col-3" >
-                <div class="card  text-bg-dark">
+                <div class="card text-bg-dark">
                     <div class="card-header">
-                        <h3> <strong style="color: yellow;">{{ cant_sucursales|safe }} Sucursales</strong></h3>
+                        <h3> <strong style="color: yellow;">{{ number_branch|safe }} Sucursales</strong></h3>
                     </div>
-                    {{ grafico_suc|safe }}
+                    {{ branch_graph|safe }}
                 </div>
 
                 <div class="card  text-bg-dark mt-2">
                     <div class="card-header">
                         <h3> <strong style="color: yellow;">Horas mas concurridas</strong></h3>
                     </div>
-                    {{ grafico_hora|safe }}
+                    {{ hour_graph|safe }}
                 </div>
             </div>
         </div>
