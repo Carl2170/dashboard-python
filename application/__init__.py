@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 from application import routes
 
-database.init_database()
+#database.init_database()
 
 
 

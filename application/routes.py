@@ -48,46 +48,6 @@ def filtrar():
 
     dashboard_filter= functions.filter_by_time(months_seleted,'datos.csv')
     return render_template('dashboard.html', **dashboard_filter)
-    # Filtrar el DataFrame por los meses seleccionados
-    # df = pd.read_csv(os.path.join(UPLOAD_FOLDER, 'datos.csv'))  # Reemplaza con el nombre de tu archivo CSV guardado
-    # df['Fecha'] = pd.to_datetime(df['Fecha'])
-    
-    # # Diccionario de nombres de meses en español
-    # nombres_meses = {
-    #     1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 
-    #     6: 'Junio', 7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 
-    #     10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
-    # }
-    
-    # # Añadir la columna de nombre del mes
-    # df['Mes'] = df['Fecha'].dt.month.map(nombres_meses)
-    
-    # # Filtrar el DataFrame por los meses seleccionados
-    # df_filtrado = df[df['Mes'].isin(meses_seleccionados)]
-
-    # # Actualizar los gráficos con los datos filtrados
-    # graph_html_total_ventas = totalVentas(df_filtrado)
-    # graph_html_total_costos = total_costo(df_filtrado)
-    # graph_html_total_ingreso = total_ingreso(df_filtrado)
-    # grafico_categ = grafico_categoria(df_filtrado)    
-    # cant_sucursales = cantidad_sucursales(df)
-    # grafico_suc = grafico_sucursales(df_filtrado)
-    # grafico_pago = grafico_tipo_pago(df_filtrado)
-    # grafico_hora = grafico_ventas_hora(df_filtrado)
-    # meses_ventas = meses(df)
-
-
-    # return render_template('dashboard.html',
-    #                        graph_html_total_ventas=graph_html_total_ventas,
-    #                        graph_html_total_costos=graph_html_total_costos,
-    #                        graph_html_total_ingreso=graph_html_total_ingreso,
-    #                        grafico_categ=grafico_categ,
-    #                        grafico_suc=grafico_suc,
-    #                        grafico_pago=grafico_pago,
-    #                        grafico_hora=grafico_hora,
-    #                        cant_sucursales=cant_sucursales,
-    #                        meses_ventas=meses_ventas)
-
 
 @app.route('/graficos')
 def upload_file1():
