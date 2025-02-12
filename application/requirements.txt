@@ -1,6 +1,9 @@
 
-pandas==2.1.0
-matplotlib==3.7.2
-seaborn==0.12.2
-plotly==5.17.0
-dash==2.18.1
+pandas
+matplotlib
+seaborn
+plotly
+dash
+dash_bootstrap_components
+openpyxl
+
