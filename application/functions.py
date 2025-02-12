@@ -350,16 +350,23 @@ def graph_branches(df):
     df['Total'] = pd.to_numeric(df['Total'], errors='coerce')
 
     #Agrupa los datos por la columna 'Sucursal' y suma los valores de la columna 'Total' para cada sucursal.
-    sales_by_branches = df.groupby('Sucursal')['Total'].sum().reset_index()
+    # sales_by_branches = df.groupby('Sucursal')['Total'].sum().reset_index()
     
-    # Generación del gráfico de torta
-    fig = px.pie(
-        sales_by_branches, 
-        names='Sucursal',       
-        values='Total',        
-        labels={'Sucursal': 'Sucursal', 'Total': 'Total de Ventas'},
-        color_discrete_sequence=px.colors.sequential.RdBu  # Esquema de color
-    )
+    # # Generación del gráfico de torta
+    # fig = px.pie(
+    #     sales_by_branches, 
+    #     names='Sucursal',       
+    #     values='Total',        
+    #     labels={'Sucursal': 'Sucursal', 'Total': 'Total de Ventas'},
+    #     color_discrete_sequence=px.colors.sequential.RdBu  # Esquema de color
+    # )
+
+    df['Margen de Ganancia'] = pd.to_numeric(df['Margen de Ganancia'], errors='coerce').fillna(0)
+    df['Precio de Venta Unitario'] = pd.to_numeric(df['Precio de Venta Unitario'], errors='coerce').fillna(0)
+    fig = px.scatter(df, x='Precio de Venta Unitario', y='Margen de Ganancia', 
+                     color='Categoría', 
+                     labels={'Precio de Venta Unitario': 'Precio de Venta Unitario', 'Margen de Ganancia': 'Margen de Ganancia'}, 
+                     color_discrete_sequence=px.colors.qualitative.T10)
 
     # Añadir más configuraciones para controlar la posición del texto
     fig.update_traces(
