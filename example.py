@@ -1,4 +1,5 @@
 
+import os
 from dash import Dash, dcc, html, dash_table, Input, Output, State, callback
 import dash_bootstrap_components as dbc
 import base64
@@ -534,4 +535,4 @@ def graph_sales_by_branch(df):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(host="0.0.0.0", port=int(os.envigron.get("PORT", 5000)))
